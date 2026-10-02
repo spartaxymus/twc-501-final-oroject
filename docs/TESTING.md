@@ -5,11 +5,13 @@
 Environment: macOS, headless Google Chrome 154.0.8037.93. Browser evidence records its own UTC timestamp in `test-results/browser-results.json`.
 
 - **37/37 unit tests passed.** Names, required entries, email validation delegation, whitespace preservation, session availability, and attendee ranges/formats.
-- **31/31 browser checks passed.** Initial and dynamic validation, first-invalid focus, partial correction, IME composition, radio navigation, all ten scenarios, slow-response completion/cancellation, stale-response prevention, unknown-outcome editing, reset, real offline hints, no-JavaScript fallback and no app storage/transmission.
+- **38/38 browser checks passed.** Initial and dynamic validation, first-invalid focus, partial correction, IME composition, radio navigation, all ten scenarios, slow-response completion/status recovery, stale-response prevention, unknown-outcome editing, reset, real offline hints, no-JavaScript fallback and no app storage/transmission. Added checks cover ticket labels, forward/reverse tab order, visible focus, error associations, a single live region, ordinary feedback copy, colored icons, original-submission counts, enlarged text and forced colors.
 - **Six axe scans reported no violations** for the enabled WCAG 2 A/AA, 2.1 AA and 2.2 AA tags: ready, errors, success, connection error, mobile errors and mobile service feedback. This is an automated result, not a full accessibility certification.
 - Layout checks covered **1440, 768, 390 and 320 CSS pixels**. Text fields remained aligned in a single column; checked controls stayed in the viewport, with no page-wide horizontal overflow.
 - Desktop and mobile error screenshots were visually reviewed for clipping, overlap and spacing. The mobile service screenshot checks the placement of feedback above the action button.
 - No JavaScript page errors, non-GET form requests or local/session storage entries were observed by the suite.
+- At 320 CSS pixels, a test-only stylesheet change enlarges body/control text to 34px; content remains within the viewport. This is not a substitute for actual browser zoom or physical-device testing.
+- GitHub Pages now requires the browser suite to pass before deployment.
 
 ## Bug found and corrected
 

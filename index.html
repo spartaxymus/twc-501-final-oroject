@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="A practice concert-registration form demonstrating accessible field errors, status messages and recovery. No real booking is made.">
   <meta name="color-scheme" content="light">
-  <title>Concert registration — Practice form</title>
+  <title>Simulated Concert registration</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="styles.css">
   <script type="module" src="app.js"></script>
@@ -15,7 +15,7 @@
   <main class="page">
     <header class="page-header">
       <p class="eyebrow">TWC 501 · Interactive example</p>
-      <h1>Concert registration</h1>
+      <h1>Simulated Concert registration</h1>
       <p class="intro">Choose a session and enter your details.</p>
       <p class="practice-notice" id="practice-notice"><strong>Practice only.</strong> Use sample information. No booking will be made.</p>
     </header>
@@ -40,8 +40,8 @@
           <fieldset class="field session-group" id="session-group" data-field="session">
             <legend>Concert session</legend>
             <div class="session-options">
-              <label class="radio-option" for="afternoon"><input type="radio" id="afternoon" name="session" value="afternoon" required><span>Afternoon <span class="session-time">— 2:00 PM</span><span class="availability" id="afternoon-availability" hidden>Full in this simulation</span></span></label>
-              <label class="radio-option" for="evening"><input type="radio" id="evening" name="session" value="evening" required><span>Evening <span class="session-time">— 7:00 PM</span><span class="availability" id="evening-availability" hidden>Full in this simulation</span></span></label>
+              <label class="radio-option" for="afternoon"><input type="radio" id="afternoon" name="session" value="afternoon" required><span>Afternoon <span class="session-time">— 2:00 PM</span><span class="availability" id="afternoon-availability" hidden>Session full</span></span></label>
+              <label class="radio-option" for="evening"><input type="radio" id="evening" name="session" value="evening" required><span>Evening <span class="session-time">— 7:00 PM</span><span class="availability" id="evening-availability" hidden>Session full</span></span></label>
             </div>
             <p class="field-error" id="session-error" hidden><span aria-hidden="true">!</span><span class="error-copy"></span></p>
           </fieldset>
@@ -69,7 +69,7 @@
 
     <section class="test-panel" aria-labelledby="test-heading">
       <div class="test-heading-row"><h2 id="test-heading">Test scenarios</h2><span class="small-tag">Demo controls</span></div>
-      <p id="scenario-help">Service responses below are simulated. No registration is sent. Choose a scenario, then complete the form and select Get Ticket or Get Tickets.</p>
+      <p id="scenario-help">Choose a scenario, complete the form, then select Get Ticket or Get Tickets. These controls only change the example response, not your internet connection.</p>
       <div class="scenario-buttons" role="group" aria-label="Core test scenarios" aria-describedby="scenario-help">
         <button type="button" data-scenario="normal" aria-pressed="true" disabled>Normal completion</button>
         <button type="button" data-scenario="slow" aria-pressed="false" disabled>Slow response</button>
@@ -87,12 +87,12 @@
           <button type="button" data-scenario="unexpected" aria-pressed="false" disabled>Unexpected response</button>
         </div>
       </details>
-      <p id="scenario-description" class="scenario-description">Normal completion: valid entries lead to a practice confirmation. No ticket is issued.</p>
+      <p id="scenario-description" class="scenario-description">Normal completion: valid entries lead to a confirmation message.</p>
       <div class="test-footer"><button id="reset-button" type="button" class="text-button" disabled>Reset demonstration</button><span>Clears entries and returns to normal completion.</span></div>
     </section>
     <footer class="page-footer">
       <p>A companion to <cite>A Guide to Writing Accessible Error Messages for Online Forms</cite>.</p>
-      <p>No account, payment, or email verification. Entries stay in this page’s memory; this demonstration does not save them for later visits.</p>
+      <p>Practice only: no booking, ticket, or email is created. Use sample details. The page does not save entries to a database. Refreshing or closing it may clear them, though your browser may restore them.</p>
     </footer>
   </main>
   <div id="announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>

@@ -1,4 +1,4 @@
-import { FIELD_ORDER, FIELD_LABELS, validateField, quantityError } from './validation.js';
+import { FIELD_ORDER, FIELD_LABELS, validateField } from './validation.js';
 
 const $ = (id) => document.getElementById(id);
 const form = $('registration');
@@ -27,16 +27,16 @@ let pointerDown = false;
 const deferredBlur = new Set();
 
 const scenarios = {
-  normal: 'Normal completion: valid entries lead to a practice confirmation. No ticket is issued.',
-  slow: 'Slow response: the simulation waits 8 seconds. You can stop waiting without clearing your entries.',
-  offline: 'No connection: a simulated connection problem prevents the request from being sent. Your device stays connected.',
-  unavailable: 'Service unavailable: the simulated service cannot accept the registration. Your entries remain on this page.',
-  unknown: 'Outcome unknown: confirmation is lost. Check the simulated status before making another attempt.',
-  unresolved: 'Status unavailable: both the simulated submission result and the follow-up status check remain uncertain.',
-  rate: 'Too many attempts: a simulated 5-second retry interval temporarily blocks another attempt. No countdown is announced.',
-  full: 'Session full: your selected session becomes unavailable in the simulation. Choose the other session to continue.',
+  normal: 'Normal completion: valid entries lead to a confirmation message.',
+  slow: 'Slow response: wait 8 seconds for a result, or stop waiting and check status. Entries stay on the page.',
+  offline: 'No connection: explore a request that cannot be sent. This test does not change your device’s connection.',
+  unavailable: 'Service unavailable: explore a service problem without losing your entries.',
+  unknown: 'Outcome unknown: check status before making another attempt.',
+  unresolved: 'Status unavailable: the submission result and the follow-up status check remain uncertain.',
+  rate: 'Too many attempts: wait 5 seconds before trying again.',
+  full: 'Session full: choose the other session when your first choice becomes unavailable.',
   closed: 'Registration closed: this scenario does not accept registrations. Choose another scenario to continue.',
-  unexpected: 'Unexpected response: an unreadable simulated response leaves the result unknown. Use the status check.'
+  unexpected: 'Unexpected response: an unreadable response leaves the result unknown. Use the status check.'
 };
 
 function values() {
@@ -87,11 +87,12 @@ function setRecovery(label = '', action = null) {
   if (hadFocus && !label) submit.focus({ preventScroll: true });
 }
 function updateButton() {
-  const plural = !quantityError(values().attendees) && Number(values().attendees.trim()) > 1;
+  const count = Number(values().attendees.trim());
+  const plural = Number.isInteger(count) && count > 1;
   const blocked = ['processing', 'checking', 'unknown', 'unresolved', 'rate', 'closed', 'complete'].includes(state);
   submit.setAttribute('aria-disabled', String(blocked));
   submit.textContent = ['processing', 'checking'].includes(state) ? (state === 'checking' ? 'Checking status…' : 'Registering…')
-    : state === 'complete' ? 'Practice complete' : plural ? 'Get Tickets' : 'Get Ticket';
+    : state === 'complete' ? 'Registration complete' : plural ? 'Get Tickets' : 'Get Ticket';
 }
 function setState(next) { state = next; form.dataset.state = state; updateButton(); }
 function paintError(field, message) {
@@ -122,7 +123,7 @@ function updateConnection(speak = false) {
   if (!attempted) return;
   const offline = navigator.onLine === false;
   if (!offline && !lastOffline) return;
-  const text = offline ? 'Your browser reports that you may be offline. You can continue using this local practice form.'
+  const text = offline ? 'Your browser reports that you may be offline. Your entries are still on this page.'
     : 'Your browser reports that you’re back online. No registration was automatically submitted.';
   $('connection-note').textContent = text;
   $('connection-note').hidden = false;
@@ -139,7 +140,8 @@ function markUnavailable(session) {
 }
 function complete(fromStatus = false) {
   setState('complete');
-  showFeedback(fromStatus ? 'The simulated registration was received.' : 'Practice registration complete.', 'No booking was made. No ticket or confirmation email was sent.', 'success');
+  const count = Number(snapshot?.attendees || values().attendees);
+  showFeedback(fromStatus ? 'Your registration was received.' : 'Registration complete.', `You registered ${count} ${count === 1 ? 'attendee' : 'attendees'}.`, 'success');
   setRecovery('Start again', reset);
 }
 function statusCheck() {
@@ -147,58 +149,57 @@ function statusCheck() {
   cancelWork();
   setState('checking');
   setRecovery();
-  showFeedback('Checking simulated status…', 'This check does not submit another registration.');
+  showFeedback('Checking registration status…', 'This check does not submit another registration.');
   later(() => {
     if (scenario === 'unresolved') {
       setState('unresolved');
-      showFeedback('The simulated registration status is still unavailable.', 'Do not submit again while the outcome is unknown. A real service needs a status or support route. Choose another test scenario to continue this demonstration.', 'warning');
-      setRecovery('Check simulated status', statusCheck);
+      showFeedback('Registration status is still unavailable.', 'Your result is not confirmed. Check again before submitting another registration.', 'warning');
+      setRecovery('Check status', statusCheck);
     } else complete(true);
   }, 1200);
 }
 function showUnknown(title) {
   firstUnknownMessage = title;
   setState('unknown');
-  showFeedback(title, 'Check the simulated status before making another attempt. Your entries are still on this page.', 'warning');
-  setRecovery('Check simulated status', statusCheck);
+  showFeedback(title, 'Check status before submitting again. Your entries are still on this page.', 'warning');
+  setRecovery('Check status', statusCheck);
 }
 function stopWaiting() {
   if (state !== 'processing') return;
   cancelWork();
-  setState('ready');
-  setRecovery();
-  showFeedback('You stopped waiting for the simulated response.', 'Your entries are still on this page. No real request was sent.');
+  showUnknown('You stopped waiting. Your registration result is not confirmed.');
 }
 function finishScenario() {
   if (scenario === 'offline') {
     setState('retry');
-    showFeedback('No internet connection — simulated.', 'The simulated request was not sent. Your entries are still on this page. Your actual connection has not changed.', 'error');
+    showFeedback('No internet connection.', 'Your request was not sent. Check your connection and try again. Your entries are still on this page.', 'error');
     setRecovery('Try again', attempt);
   } else if (scenario === 'unavailable') {
     setState('retry');
-    showFeedback('The simulated registration service is unavailable.', 'No simulated registration was accepted. Try again later or choose another test scenario. Your entries are still on this page.', 'error');
+    showFeedback('The registration service is unavailable.', 'Try again later. Your entries are still on this page.', 'error');
     setRecovery('Try again', attempt);
   } else if (['unknown', 'unresolved', 'unexpected'].includes(scenario)) {
-    showUnknown(scenario === 'unexpected' ? 'We couldn’t confirm the simulated registration result.' : 'We couldn’t confirm whether the simulated registration was received.');
+    showUnknown(scenario === 'unexpected' ? 'We couldn’t read the registration response.' : 'We couldn’t confirm whether your registration was received.');
   } else if (scenario === 'rate' && !rateSatisfied) {
     setState('rate');
-    showFeedback('Please wait before trying again.', 'This simulation has a 5-second retry interval. Your entries are still on this page.', 'warning');
+    showFeedback('Please wait before trying again.', 'Try again in 5 seconds. Your entries are still on this page.', 'warning');
     later(() => {
       rateSatisfied = true;
       setState('retry');
-      showFeedback('You can try again now.', 'The simulated waiting period has ended.');
+      showFeedback('You can try again now.', 'The waiting period has ended.');
       setRecovery('Try again', attempt);
     }, 5000);
   } else if (scenario === 'full' && !unavailableSession) {
     markUnavailable(snapshot.session);
     const label = snapshot.session === 'afternoon' ? 'afternoon' : 'evening';
     setState('retry');
-    showFeedback(`The ${label} session is now full — simulated.`, 'Choose the other available session. Your other entries are still on this page.', 'warning');
+    validate('session');
+    showFeedback(`The ${label} session is now full.`, 'Choose the other available session. Your other entries are still on this page.', 'warning');
     setRecovery('Choose another session', () => controls.session.find((input) => input.value !== unavailableSession).focus());
   } else if (scenario === 'closed') {
     setState('closed');
-    showFeedback('Registration for this event has closed — simulated.', 'This scenario cannot accept a registration. Your entries are still on this page. Choose another test scenario to continue.', 'warning');
-    setRecovery('Choose a test scenario', () => document.querySelector('[data-scenario="normal"]').focus());
+    showFeedback('Registration for this event has closed.', 'New registrations are no longer accepted. Your entries are still on this page.', 'warning');
+    setRecovery();
   } else complete();
 }
 function attempt(event) {
@@ -223,9 +224,9 @@ function attempt(event) {
   snapshot = { ...values() };
   setState('processing');
   setRecovery();
-  showFeedback('Registering…', 'Checking your practice registration. No real registration is sent.');
+  showFeedback('Registering…', 'Please wait while we process your registration.');
   if (scenario === 'slow') {
-    later(() => { showFeedback('This is taking longer than expected.', 'You can keep waiting or stop the simulated response.'); setRecovery('Stop waiting', stopWaiting); }, 2000);
+    later(() => { showFeedback('This is taking longer than expected.', 'You can keep waiting or stop waiting and check your registration status.'); setRecovery('Stop waiting', stopWaiting); }, 2000);
     later(finishScenario, 8000);
   } else later(finishScenario, 1000);
 }
@@ -236,12 +237,12 @@ function inputChanged(field, event) {
     cancelWork();
     if (wasChecking) {
       setState('unknown');
-      showFeedback(firstUnknownMessage || 'The previous simulated result is still unknown.', 'Your edits do not resolve the earlier attempt. Check simulated status before submitting again.', 'warning');
-      setRecovery('Check simulated status', statusCheck);
+      showFeedback(firstUnknownMessage || 'Your previous registration result is still unknown.', 'Your edits do not change the earlier attempt. Check status before submitting again.', 'warning');
+      setRecovery('Check status', statusCheck);
     } else {
       setState('ready');
       setRecovery();
-      showFeedback('Your details changed.', 'Submit again to check the updated information. The previous simulation was stopped.');
+      showUnknown('Your details changed. The earlier registration result is not confirmed.');
     }
   } else if (state === 'complete') {
     setState('ready'); setRecovery(); clearFeedback();
@@ -312,7 +313,7 @@ window.addEventListener('pagehide', () => { cancelWork(); silence(); });
 window.addEventListener('pageshow', (event) => {
   if (event.persisted && ['processing', 'checking'].includes(state)) {
     setState('ready'); setRecovery();
-    showFeedback('The demonstration was paused when you left this page.', 'Submit again to run a new simulation.');
+    showUnknown('Your registration result is not confirmed.');
   }
 });
 

@@ -42,7 +42,7 @@ async function axe(name) {
 try {
   await page.goto(base);
   await check('Initial state and single-column layout', async () => {
-    assert.equal(await page.title(), 'Concert registration — Practice form');
+    assert.equal(await page.title(), 'Simulated Concert registration');
     assert.equal(await state(), 'ready');
     assert.equal(await page.locator('.field-error:visible').count(), 0);
     assert.equal(await page.locator('#feedback').isVisible(), false);
@@ -113,7 +113,7 @@ try {
     await page.locator('#submit-button').click();
     await page.locator('#registration').dispatchEvent('submit');
     await waitState('complete');
-    assert.match(await page.locator('#feedback').innerText(), /No booking was made/);
+    assert.match(await page.locator('#feedback').innerText(), /You registered 2 attendees/);
     assert.equal(await page.locator('#submit-button').getAttribute('aria-disabled'), 'true');
     assert.equal(await page.locator('#full-name').inputValue(), 'Alex Morgan');
     await screenshot('desktop-success.png');
@@ -121,7 +121,7 @@ try {
   });
   await check('Simulated connection failure and safe retry', async () => {
     await begin('offline'); await waitState('retry');
-    assert.match(await page.locator('#feedback').innerText(), /simulated request was not sent/);
+    assert.match(await page.locator('#feedback').innerText(), /Your request was not sent/);
     assert.equal(await page.locator('[aria-invalid="true"]').count(), 0);
     await page.locator('#recovery-button').click(); await waitState('retry');
     assert.equal(await page.locator('#email').inputValue(), 'alex@example.com');
@@ -138,17 +138,17 @@ try {
     await page.locator('#registration').dispatchEvent('submit');
     assert.equal(await state(), 'unknown');
     await page.locator('#recovery-button').click(); await waitState('complete');
-    assert.match(await page.locator('#feedback').innerText(), /simulated registration was received/);
+    assert.match(await page.locator('#feedback').innerText(), /Your registration was received/);
   });
   await check('Unresolved status remains uncertain with no blind retry', async () => {
     await begin('unresolved'); await waitState('unknown');
     await page.locator('#recovery-button').click(); await waitState('unresolved');
     assert.equal(await page.locator('#submit-button').getAttribute('aria-disabled'), 'true');
-    assert.match(await page.locator('#feedback').innerText(), /Do not submit again/);
+    assert.match(await page.locator('#feedback').innerText(), /Check again before submitting/);
   });
   await check('Unexpected response routes to status check', async () => {
     await begin('unexpected'); await waitState('unknown');
-    assert.equal(await page.locator('#recovery-button').innerText(), 'Check simulated status');
+    assert.equal(await page.locator('#recovery-button').innerText(), 'Check status');
   });
   await check('Rate limit blocks retry then explicitly enables it', async () => {
     await begin('rate'); await waitState('rate');
@@ -163,22 +163,25 @@ try {
     assert.equal(await page.locator('#evening').isChecked(), false);
     await page.locator('#evening').check(); await page.locator('#submit-button').click(); await waitState('complete');
   });
-  await check('Closed registration has an alternate scenario recovery', async () => {
+  await check('Closed registration blocks submission without a false recovery', async () => {
     await begin('closed'); await waitState('closed');
     assert.equal(await page.locator('#submit-button').getAttribute('aria-disabled'), 'true');
-    await page.locator('#recovery-button').click();
-    assert.equal(await page.evaluate(() => document.activeElement.dataset.scenario), 'normal');
+    assert.equal(await page.locator('#recovery-button').isVisible(), false);
+    await select('normal');
+    assert.equal(await state(), 'ready');
   });
   await check('Slow response can be stopped without clearing data', async () => {
     await begin('slow'); await page.locator('#recovery-button').waitFor({ state: 'visible' });
     assert.equal(await page.locator('#recovery-button').innerText(), 'Stop waiting');
     await page.locator('#recovery-button').click();
-    assert.equal(await state(), 'ready');
+    assert.equal(await state(), 'unknown');
+    assert.equal(await page.locator('#recovery-button').innerText(), 'Check status');
     assert.equal(await page.locator('#full-name').inputValue(), 'Alex Morgan');
+    await page.locator('#recovery-button').click(); await waitState('complete');
   });
   await check('Slow response completes when the user keeps waiting', async () => {
     await begin('slow'); await waitState('complete');
-    assert.match(await page.locator('#feedback').innerText(), /No booking was made/);
+    assert.match(await page.locator('#feedback').innerText(), /Registration complete/);
   });
   await check('Reset during processing cancels the obsolete outcome', async () => {
     await begin('normal'); await reset(); await page.waitForTimeout(1200);
@@ -199,9 +202,9 @@ try {
   });
   await check('Editing pending data cancels obsolete response', async () => {
     await begin('normal'); await page.locator('#full-name').fill('Updated sample');
-    assert.equal(await state(), 'ready');
+    assert.equal(await state(), 'unknown');
     await page.waitForTimeout(1200);
-    assert.equal(await state(), 'ready');
+    assert.equal(await state(), 'unknown');
     assert.match(await page.locator('#feedback').innerText(), /details changed/);
   });
   await check('Changing scenarios cancels pending work without clearing entries', async () => {
@@ -261,6 +264,87 @@ try {
   await check('No runtime errors, data transmission or app storage', async () => {
     assert.deepEqual(errors, []); assert.deepEqual(submissions, []);
     assert.equal(await page.evaluate(() => localStorage.length + sessionStorage.length), 0);
+  });
+  await check('Ticket label follows every valid attendee count', async () => {
+    await reset();
+    for (const count of ['1', '2', '3', '4', '5', '1']) {
+      await page.locator('#attendees').fill(count);
+      assert.equal(await page.locator('#submit-button').innerText(), count === '1' ? 'Get Ticket' : 'Get Tickets');
+    }
+  });
+  await check('Keyboard follows the form and then the test controls', async () => {
+    await reset();
+    assert.equal(await page.evaluate(() => document.activeElement.id), 'full-name');
+    for (const id of ['email', 'afternoon']) {
+      await page.keyboard.press('Tab');
+      assert.equal(await page.evaluate(() => document.activeElement.id), id);
+    }
+    await page.keyboard.press('ArrowRight');
+    assert.equal(await page.evaluate(() => document.activeElement.id), 'evening');
+    await page.keyboard.press('Tab');
+    assert.equal(await page.evaluate(() => document.activeElement.id), 'attendees');
+    await page.keyboard.press('Tab');
+    assert.equal(await page.evaluate(() => document.activeElement.id), 'submit-button');
+    const outline = await page.locator('#submit-button').evaluate(el => getComputedStyle(el).outlineWidth);
+    assert.equal(outline, '3px');
+    await page.keyboard.press('Tab');
+    assert.equal(await page.evaluate(() => document.activeElement.dataset.scenario), 'normal');
+    await page.keyboard.press('Shift+Tab');
+    assert.equal(await page.evaluate(() => document.activeElement.id), 'submit-button');
+    await page.keyboard.press('Enter');
+    assert.equal(await page.evaluate(() => document.activeElement.id), 'full-name');
+  });
+  await check('Errors have text, decorative icons and valid descriptions', async () => {
+    await reset(); await page.locator('#submit-button').click();
+    for (const id of ['full-name', 'email', 'afternoon', 'evening', 'attendees']) {
+      const input = page.locator(`#${id}`);
+      assert.equal(await input.getAttribute('aria-invalid'), 'true');
+      const ids = (await input.getAttribute('aria-describedby')).split(' ');
+      for (const description of ids) assert.equal(await page.locator(`#${description}`).isVisible(), true);
+    }
+    for (const error of await page.locator('.field-error').all()) {
+      assert.equal(await error.locator('span').first().getAttribute('aria-hidden'), 'true');
+      assert((await error.locator('.error-copy').innerText()).length > 0);
+    }
+    assert.equal(await page.locator('[role="status"]').count(), 1);
+    assert.equal(await page.locator('#announcer').getAttribute('aria-atomic'), 'true');
+    await page.locator('#full-name').fill('Alex Morgan');
+    await page.waitForFunction(() => document.getElementById('announcer').textContent.includes('error cleared'));
+    assert.equal(await page.evaluate(() => document.activeElement.id), 'full-name');
+    assert.equal(await page.locator('#full-name').getAttribute('aria-invalid'), null);
+  });
+  await check('Feedback uses distinct colored icons and ordinary service wording', async () => {
+    const colors = new Set();
+    for (const [scenario, expectedState, tone] of [['normal', 'complete', 'success'], ['offline', 'retry', 'error'], ['unknown', 'unknown', 'warning']]) {
+      await begin(scenario); await waitState(expectedState);
+      assert.equal(await page.locator('#feedback').getAttribute('data-tone'), tone);
+      assert.doesNotMatch(await page.locator('#feedback').innerText(), /simulat|practice/i);
+      assert.equal(await page.locator('#feedback-icon').getAttribute('aria-hidden'), 'true');
+      colors.add(await page.locator('#feedback-icon').evaluate(el => getComputedStyle(el).backgroundColor));
+    }
+    assert.equal(colors.size, 3);
+  });
+  await check('Status result refers to original entries after an edit', async () => {
+    await begin('unknown'); await waitState('unknown');
+    await page.locator('#attendees').fill('4');
+    await page.locator('#recovery-button').click(); await waitState('complete');
+    assert.match(await page.locator('#feedback').innerText(), /2 attendees/);
+    assert.equal(await page.locator('#attendees').inputValue(), '4');
+  });
+  await check('Enlarged text keeps controls within a narrow viewport', async () => {
+    await page.setViewportSize({ width: 320, height: 844 }); await reset();
+    await page.evaluate(() => document.styleSheets[0].insertRule('body, input, button, label, legend, .hint, .field-error, .feedback p, .radio-option span { font-size: 34px !important; }', document.styleSheets[0].cssRules.length));
+    await page.locator('#submit-button').click();
+    assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+    await screenshot('mobile-enlarged-text.png');
+    await page.reload();
+  });
+  await check('Forced colors retains feedback and focus boundaries', async () => {
+    await page.emulateMedia({ forcedColors: 'active' });
+    await reset(); await page.locator('#submit-button').click();
+    assert.notEqual(await page.locator('.field-error > span').first().evaluate(el => getComputedStyle(el).borderTopStyle), 'none');
+    await screenshot('forced-colors-errors.png');
+    await page.emulateMedia({ forcedColors: 'none' });
   });
 } finally {
   await writeFile(new URL('browser-results.json', output), JSON.stringify({ date: new Date().toISOString(), browser: browser.version(), platform: process.platform, results }, null, 2));

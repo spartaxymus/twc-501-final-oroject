@@ -7,7 +7,7 @@ for (const name of ['A', '李', 'สมชาย', 'Élodie', "O’Connor", 'Ale
   test(`Accept nonblank name ${name}`, () => assert.equal(validateField('fullName', { ...values, fullName: name }), ''));
 }
 for (const name of ['', ' ', '\t\n']) {
-  test(`Reject blank name ${JSON.stringify(name)}`, () => assert.equal(validateField('fullName', { ...values, fullName: name }), 'Enter your full name.'));
+  test(`Reject blank name ${JSON.stringify(name)}`, () => assert.equal(validateField('fullName', { ...values, fullName: name }), 'Enter your name.'));
 }
 for (const value of ['1', '2', '3', '4', ' 2 ', '02']) test(`Quantity accepts ${JSON.stringify(value)}`, () => assert.equal(quantityError(value), ''));
 for (const value of ['0', '-1']) test(`Quantity minimum ${value}`, () => assert.equal(quantityError(value), 'Enter at least 1 attendee.'));

@@ -22,9 +22,12 @@ The form accompanies the final-project manual. This checklist maps its requireme
 
 ## Scope decisions
 
-- The draft’s “No internet connection” example is labelled “simulated” so it does not falsely describe the user’s device.
-- Names and email examples in error messages match the Full name / you@example.com labels.
-- “Registering…” is accompanied by “Checking your practice registration. No real registration is sent.”
+- The October 2 PDF is the content baseline. The later requested heading is “Simulated Concert registration”; feedback uses ordinary registration language, with practice-only disclosure outside the form.
+- The empty name message matches Table 3: “Enter your name.” Other field messages retain the manual's wording.
+- “Registering…” is accompanied by “Please wait while we process your registration.”
+- The requested recovery label “Check status” replaces the manual's older “Check simulated status.” The PDF itself remains unchanged.
+- Each feedback tone uses a colored icon and explanatory text. Icons are hidden from screen readers to avoid repeating the message.
+- Stopping a wait or editing pending entries requires a status check before retrying. This avoids implying that stopping a wait cancels a request already sent in a real service.
 - Only field validity is real. Server outcomes and wait intervals are teaching simulations.
 - Passwords, payments, real booking confirmation emails, and account sessions are outside this four-field form.
 - The code includes no top error summary, consistent with the selected short-form layout. The error-summary pattern can be appropriate for other forms.

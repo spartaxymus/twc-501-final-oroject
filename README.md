@@ -26,7 +26,9 @@ Open **http://localhost:8081**. Use a server rather than double-clicking `index.
 4. Select **Get Ticket** or **Get Tickets**. Local validation runs before the simulated service response.
 5. Follow the recovery action, or use **Reset demonstration** to clear entries and start over.
 
-The button changes to **Get Tickets** for a valid quantity above one. Names need only be nonblank; single names, short names, accents, and non-Latin characters are accepted. Email checks format, not existence or ownership.
+The button reads **Get Ticket** for one attendee and **Get Tickets** for two, three, or four. During processing it reads **Registering…**, during a status check **Checking status…**, and after success **Registration complete**. Names need only be nonblank; single names, short names, accents, and non-Latin characters are accepted. Email checks format, not existence or ownership.
+
+The heading is **Simulated Concert registration**. Feedback uses ordinary service language, while a persistent notice outside the form explains that no real booking, ticket, or email is created. Sample success messages do not represent a real reservation.
 
 ## Features
 
@@ -44,11 +46,11 @@ The button changes to **Get Tickets** for a valid quantity above one. Names need
 
 | Scenario | Behavior |
 | --- | --- |
-| Normal completion | Confirmation explicitly says no booking, ticket, or email was created. |
-| Slow response | Waiting feedback after 2 seconds; completion after 8 seconds; optional Stop waiting. |
+| Normal completion | Confirmation shows the number of attendees submitted. The separate practice notice explains the limits. |
+| Slow response | Waiting feedback after 2 seconds; completion after 8 seconds; Stop waiting leads to Check status, not a blind retry. |
 | No connection | Simulated pre-send failure with retained entries and Try again. Does not change the device’s connection. |
 | Service unavailable | Service-level failure, without marking valid inputs as incorrect. |
-| Outcome unknown | Blocks repeat submission; Check simulated status resolves the sample outcome. |
+| Outcome unknown | Blocks repeat submission; Check status resolves the sample outcome. |
 | Status unavailable | Follow-up check remains uncertain; no fabricated support contact or blind retry. |
 | Too many attempts | Fixed, explicitly simulated 5-second retry interval, then retry becomes available. |
 | Session full | Selected session becomes unavailable; the user chooses the alternate session. No silent switch. |
@@ -56,6 +58,8 @@ The button changes to **Get Tickets** for a valid quantity above one. Names need
 | Unexpected response | Unreadable response follows the unknown-outcome/status-check route. |
 
 Simulation delays are demonstration settings, not measured service performance.
+
+If entries change while processing, the earlier result becomes uncertain and requires a status check. The confirmation refers to the original submitted attendee count, not later edits. Keyboard order follows name, email, session, attendees, submission, any recovery action, and then the test controls. Only failed submission moves focus to an invalid field; live corrections keep the user's focus.
 
 ## Privacy and limits
 

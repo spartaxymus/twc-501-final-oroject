@@ -14,7 +14,7 @@ export function quantityError(value) {
 
 export function validateField(field, values, emailFormatIsValid, unavailableSession = '') {
   const value = String(values[field] ?? '').trim();
-  if (field === 'fullName') return value ? '' : 'Enter your full name.';
+  if (field === 'fullName') return value ? '' : 'Enter your name.';
   if (field === 'email') {
     if (!value) return 'Enter your email address.';
     return emailFormatIsValid(value) ? '' : 'Enter an email address in the format you@example.com.';
