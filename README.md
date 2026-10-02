@@ -96,4 +96,4 @@ For an existing Chrome installation, set `CHROME_PATH` when running the browser 
 - [GOV.UK — Names](https://design-system.service.gov.uk/patterns/names/)
 - [MDN — Navigator.onLine](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/onLine)
 
-The message copy and simulated concert rules are project examples. Below-field placement and blur/live-correction timing are specific design choices, not universal requirements from these sources. The source Word document is not included or modified.
+The message copy and simulated concert rules are project examples. Below-field placement and blur/live-correction timing are specific design choices, not universal requirements from these sources.

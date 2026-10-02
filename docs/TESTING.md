@@ -24,7 +24,7 @@ Run `npm run test:browser` to regenerate:
 - `test-results/desktop-ready.png`, `desktop-errors.png`, `desktop-success.png`, `desktop-connection-error.png`.
 - `test-results/tablet-errors.png`, `mobile-errors.png`, `mobile-connection-error.png`.
 
-These are screenshots of the working app, not generated concepts. Only sample entries are used. A GitHub Actions workflow runs the checks independently and uploads the evidence as a workflow artifact.
+Screenshots use sample entries in the working app. GitHub Actions runs the checks and saves the results as a workflow artifact.
 
 ## Still needs human evaluation
 
@@ -33,4 +33,4 @@ These are screenshots of the working app, not generated concepts. Only sample en
 - People using the manual to write/revise a message and recover from the demonstrated errors.
 - Other browser engines. Local results are Chrome results only.
 
-Do not describe these pending checks as completed, invent participant findings, or claim full WCAG conformance. The simulated service has no real backend or operational reliability evidence.
+These manual checks remain pending. Automated results do not establish full WCAG conformance, and simulated responses do not establish real-service reliability.

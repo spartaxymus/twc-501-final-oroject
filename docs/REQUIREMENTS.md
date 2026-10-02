@@ -1,6 +1,6 @@
 # Manual alignment
 
-The supplied final-project Word draft controls the field labels, hint text and ticket-button wording. Later drafted sections supply message-writing, accessibility, demonstration, testing and troubleshooting requirements. The Word document remains unchanged.
+The form accompanies the final-project manual. This checklist maps its requirements to the implementation.
 
 | Manual requirement | Implementation |
 | --- | --- |
@@ -18,12 +18,12 @@ The supplied final-project Word draft controls the field labels, hint text and t
 | External scenario controls | Buttons outside the attendee form set the next valid submission outcome without immediately showing it. |
 | No connection | Explicitly simulated pre-send failure. Actual browser offline reports are a separate, qualified hint and never block local work. |
 | Unknown outcome | A status check replaces blind resubmission; editing entries does not resolve an uncertain earlier attempt. |
-| Supplementary designs | Shared CSS tokens support later Figma alignment. This task does not create or update a Figma file. |
+| Supplementary designs | Shared CSS tokens support consistent Figma layouts. |
 
 ## Scope decisions
 
 - The draft’s “No internet connection” example is labelled “simulated” so it does not falsely describe the user’s device.
-- Names and email examples in error messages match the latest Full name / you@example.com labels, rather than the older concept’s Name / alex@example.com copy.
+- Names and email examples in error messages match the Full name / you@example.com labels.
 - “Registering…” is accompanied by “Checking your practice registration. No real registration is sent.”
 - Only field validity is real. Server outcomes and wait intervals are teaching simulations.
 - Passwords, payments, real booking confirmation emails, and account sessions are outside this four-field form.
@@ -33,4 +33,4 @@ The supplied final-project Word draft controls the field labels, hint text and t
 
 ## Remaining academic deliverables
 
-Use actual app screenshots in the manual. Add real repository/demo and Figma links only when verified. Record actual evaluation findings and a self-assessment separately; this project does not fabricate participant results or claim full accessibility conformance.
+Remaining items: app screenshots, verified project links, evaluation findings, and a separate self-assessment. Full accessibility conformance requires manual evaluation beyond the automated checks in this repository.
