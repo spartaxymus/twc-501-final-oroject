@@ -1,0 +1,20 @@
+{
+  "name": "twc-501-final-oroject",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Accessible concert-registration practice form for TWC 501. Vanilla HTML, CSS and JavaScript with simulated recovery scenarios.",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs",
+    "test": "node --test tests/validation.test.mjs",
+    "test:browser": "node tests/browser.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "playwright": "^1.63.0"
+  }
+}

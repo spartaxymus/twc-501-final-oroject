@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A practice concert-registration form demonstrating accessible field errors, status messages and recovery. No real booking is made.">
+  <meta name="color-scheme" content="light">
+  <title>Concert registration — Practice form</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#registration">Skip to registration</a>
+  <main class="page">
+    <header class="page-header">
+      <p class="eyebrow">TWC 501 · Interactive example</p>
+      <h1>Concert registration</h1>
+      <p class="intro">Choose a session and enter your details.</p>
+      <p class="practice-notice" id="practice-notice"><strong>Practice only.</strong> Use sample information. No booking will be made.</p>
+    </header>
+
+    <div class="form-card">
+      <p class="required-note" id="required-note">All fields are required.</p>
+      <p id="script-fallback">This practice form needs JavaScript. Enable it and reload the page to try the demonstration.</p>
+      <form id="registration" novalidate aria-label="Concert registration" aria-describedby="practice-notice required-note">
+        <fieldset id="form-controls" class="form-controls" disabled>
+          <legend class="sr-only">Registration details</legend>
+          <div class="field" data-field="fullName">
+            <label for="full-name">Full name</label>
+            <input id="full-name" type="text" autocomplete="name" spellcheck="false" required>
+            <p class="field-error" id="fullName-error" hidden><span aria-hidden="true">!</span><span class="error-copy"></span></p>
+          </div>
+          <div class="field" data-field="email">
+            <label for="email">Email address</label>
+            <p class="hint" id="email-hint">For example, you@example.com.</p>
+            <input id="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" required aria-describedby="email-hint">
+            <p class="field-error" id="email-error" hidden><span aria-hidden="true">!</span><span class="error-copy"></span></p>
+          </div>
+          <fieldset class="field session-group" id="session-group" data-field="session">
+            <legend>Concert session</legend>
+            <div class="session-options">
+              <label class="radio-option" for="afternoon"><input type="radio" id="afternoon" name="session" value="afternoon" required><span>Afternoon <span class="session-time">— 2:00 PM</span><span class="availability" id="afternoon-availability" hidden>Full in this simulation</span></span></label>
+              <label class="radio-option" for="evening"><input type="radio" id="evening" name="session" value="evening" required><span>Evening <span class="session-time">— 7:00 PM</span><span class="availability" id="evening-availability" hidden>Full in this simulation</span></span></label>
+            </div>
+            <p class="field-error" id="session-error" hidden><span aria-hidden="true">!</span><span class="error-copy"></span></p>
+          </fieldset>
+          <div class="field" data-field="attendees">
+            <label for="attendees">Number of attendees</label>
+            <p class="hint" id="attendees-hint">Enter a whole number from 1 to 4, including yourself.</p>
+            <input id="attendees" class="quantity-input" type="text" inputmode="numeric" autocomplete="off" required aria-describedby="attendees-hint">
+            <p class="field-error" id="attendees-error" hidden><span aria-hidden="true">!</span><span class="error-copy"></span></p>
+          </div>
+
+          <div class="feedback-area">
+            <p id="connection-note" class="connection-note" hidden></p>
+            <section id="feedback" class="feedback" aria-label="Registration feedback" hidden>
+              <span id="feedback-icon" class="feedback-icon" aria-hidden="true">i</span>
+              <div><h2 id="feedback-title"></h2><p id="feedback-detail"></p></div>
+            </section>
+          </div>
+          <div class="form-actions">
+            <button class="primary-button" id="submit-button" type="submit">Get Ticket</button>
+            <button class="secondary-button" id="recovery-button" type="button" hidden></button>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+
+    <section class="test-panel" aria-labelledby="test-heading">
+      <div class="test-heading-row"><h2 id="test-heading">Test scenarios</h2><span class="small-tag">Demo controls</span></div>
+      <p id="scenario-help">Service responses below are simulated. No registration is sent. Choose a scenario, then complete the form and select Get Ticket or Get Tickets.</p>
+      <div class="scenario-buttons" role="group" aria-label="Core test scenarios" aria-describedby="scenario-help">
+        <button type="button" data-scenario="normal" aria-pressed="true" disabled>Normal completion</button>
+        <button type="button" data-scenario="slow" aria-pressed="false" disabled>Slow response</button>
+        <button type="button" data-scenario="offline" aria-pressed="false" disabled>No connection</button>
+        <button type="button" data-scenario="unavailable" aria-pressed="false" disabled>Service unavailable</button>
+        <button type="button" data-scenario="unknown" aria-pressed="false" disabled>Outcome unknown</button>
+      </div>
+      <details id="extended-scenarios">
+        <summary>More scenarios</summary>
+        <div class="scenario-buttons" role="group" aria-label="Extended test scenarios">
+          <button type="button" data-scenario="unresolved" aria-pressed="false" disabled>Status unavailable</button>
+          <button type="button" data-scenario="rate" aria-pressed="false" disabled>Too many attempts</button>
+          <button type="button" data-scenario="full" aria-pressed="false" disabled>Session full</button>
+          <button type="button" data-scenario="closed" aria-pressed="false" disabled>Registration closed</button>
+          <button type="button" data-scenario="unexpected" aria-pressed="false" disabled>Unexpected response</button>
+        </div>
+      </details>
+      <p id="scenario-description" class="scenario-description">Normal completion: valid entries lead to a practice confirmation. No ticket is issued.</p>
+      <div class="test-footer"><button id="reset-button" type="button" class="text-button" disabled>Reset demonstration</button><span>Clears entries and returns to normal completion.</span></div>
+    </section>
+    <footer class="page-footer">
+      <p>A companion to <cite>A Guide to Writing Accessible Error Messages for Online Forms</cite>.</p>
+      <p>No account, payment, or email verification. Entries stay in this page’s memory; this demonstration does not save them for later visits.</p>
+    </footer>
+  </main>
+  <div id="announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>
