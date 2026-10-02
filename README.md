@@ -4,6 +4,10 @@ A working companion to **A Guide to Writing Accessible Error Messages for Online
 
 Built with HTML, CSS, and vanilla JavaScript. The centered form stays in one column on desktop, tablet, and mobile. **This is a teaching demonstration, not a ticket-booking service.**
 
+**[Open the live demo](https://spartaxymus.github.io/twc-501-final-oroject/)**
+
+GitHub Pages publishes the four application files from `main`. Tests, documentation, and local development tools are excluded from the deployed site.
+
 ## Run locally
 
 Requires Node.js 20 or newer. There are no runtime dependencies.
