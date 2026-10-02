@@ -28,7 +28,7 @@ button { cursor: pointer; }
 .skip-link { position: fixed; left: 16px; top: -100px; z-index: 5; color: white; background: var(--ink); padding: 12px 20px; }
 .skip-link:focus { top: 16px; }
 .skip-link:not(:focus) { clip-path: inset(50%); width: 1px; height: 1px; overflow: hidden; }
-.page { width: min(100% - 48px, 720px); margin: 0 auto; padding: 52px 0 28px; }
+.page { width: min(100% - 48px, 720px); margin: 0 auto; padding: 52px 0 28px; overflow-wrap: anywhere; }
 .eyebrow { font-size: 12px; font-weight: 650; text-transform: uppercase; letter-spacing: .11em; color: var(--muted); margin: 0 0 12px; }
 h1 { font-size: clamp(30px, 4.5vw, 42px); line-height: 1.15; letter-spacing: -.035em; margin: 0 0 12px; }
 .intro { margin: 0; font-size: 18px; }
@@ -49,6 +49,7 @@ input.quantity-input { max-width: 190px; }
 .session-options { display: grid; gap: 10px; }
 .radio-option { display: flex; gap: 12px; align-items: center; width: 100%; max-width: 100%; min-height: 54px; cursor: pointer; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius); }
 .radio-option:has(input:checked) { background: var(--blue-soft); border-color: var(--blue); }
+.radio-option > span, .feedback > div { min-width: 0; }
 .radio-option:has(input:focus-visible) { outline: 3px solid #925400; outline-offset: 4px; }
 .radio-option input:focus-visible { outline: none; }
 .radio-option input { appearance: auto; accent-color: var(--blue); width: 22px; height: 22px; margin: 0; flex: 0 0 22px; scroll-margin-top: 28px; }

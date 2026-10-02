@@ -17,6 +17,8 @@ Environment: macOS, headless Google Chrome 154.0.8037.93. Browser evidence recor
 
 The first browser run found that displaying an error on blur could move the submit button between pointer-down and pointer-up. Validation now finishes after the pointer action; submit, reset and scenario selection clear deferred blur checks. The regression test passes.
 
+The October 2 Linux check also found that enlarged text can overflow under different system font metrics. Long text now wraps within the page, and flex children can shrink to fit. The deployment gate checks this case before publication.
+
 ## Evidence
 
 Run `npm run test:browser` to regenerate:
